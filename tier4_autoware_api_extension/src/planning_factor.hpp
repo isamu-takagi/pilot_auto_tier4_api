@@ -15,11 +15,14 @@
 #ifndef PLANNING_FACTOR_HPP_
 #define PLANNING_FACTOR_HPP_
 
+#include <autoware/agnocast_wrapper/node.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <autoware_internal_planning_msgs/msg/planning_factor_array.hpp>
 #include <tier4_external_api_msgs/msg/planning_factor_array.hpp>
 
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace tier4_autoware_api_extension
@@ -28,19 +31,20 @@ namespace tier4_autoware_api_extension
 using ExternalArray = tier4_external_api_msgs::msg::PlanningFactorArray;
 using InternalArray = autoware_internal_planning_msgs::msg::PlanningFactorArray;
 
-class PlanningFactor : public rclcpp::Node
+class PlanningFactor : public autoware::agnocast_wrapper::Node
 {
 public:
   explicit PlanningFactor(const rclcpp::NodeOptions & options);
 
 private:
   void on_timer();
-  rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<ExternalArray>::SharedPtr pub_planning_factors_;
-  std::vector<rclcpp::Subscription<InternalArray>::SharedPtr> sub_planning_factors_;
-  std::vector<InternalArray::ConstSharedPtr> factors_;
+  AUTOWARE_TIMER_PTR timer_;
+  AUTOWARE_PUBLISHER_PTR(ExternalArray) pub_planning_factors_;
+  std::vector<AUTOWARE_SUBSCRIPTION_PTR(InternalArray)> sub_planning_factors_;
+  std::vector<AUTOWARE_MESSAGE_CONST_SHARED_PTR(InternalArray)> factors_;
 
   double timeout_;
+  std::unordered_map<std::string, std::string> behavior_name_remapping_;
 };
 
 }  // namespace tier4_autoware_api_extension
